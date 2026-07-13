@@ -6,7 +6,8 @@ metadata:
     argocd.argoproj.io/sync-wave: "2"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  version: v1.30-latest
   namespace: istio-system
   updateStrategy:
     type: InPlace
+    inactiveRevisionDeletionGracePeriodSeconds: 30
+  version: v1.30.1
