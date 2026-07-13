@@ -23,7 +23,7 @@ Once both phases are applied, Argo CD manages itself and all features from this 
 
 ## Prerequisites
 
-- OpenShift Container Platform **4.21** cluster
+- OpenShift Container Platform **4.19+** cluster
 - `oc` CLI installed and authenticated as **cluster-admin**
 - A fork of this repository pushed to GitHub (Argo CD needs to pull from it)
 
