@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cluster-features
+  namespace: openshift-gitops
+spec:
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
+  generators:
+    - git:
+        repoURL: https://github.com/Jnowakoski15/openshift-connectivity-link-demo.git
+        revision: HEAD
+        directories:
+          - path: clusters/features/*
+  template:
+    metadata:
+      name: "{{.path.basename}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/Jnowakoski15/openshift-connectivity-link-demo.git
+        targetRevision: HEAD
+        path: "{{.path.path}}"
+      destination:
+        server: https://kubernetes.default.svc
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=false
+          - ServerSideApply=true
