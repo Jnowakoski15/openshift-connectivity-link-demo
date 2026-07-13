@@ -17,6 +17,7 @@ Once both phases are applied, Argo CD manages itself and all features from this 
 
 | Feature | Namespace | Operator Package | Channel |
 |---------|-----------|-----------------|---------|
+| [Red Hat OpenShift Service Mesh 3](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0) | `openshift-operators` | `servicemeshoperator3` | `stable` |
 | [Red Hat Connectivity Link](https://docs.redhat.com/en/documentation/red_hat_connectivity_link/) | `kuadrant-system` | `rhcl-operator` | `stable` |
 | [Red Hat Developer Hub](https://docs.redhat.com/en/documentation/red_hat_developer_hub/) | `rhdh-operator` | `rhdh` | `fast` |
 | [Red Hat OpenShift Dev Spaces](https://docs.redhat.com/en/documentation/red_hat_openshift_dev_spaces/) | `openshift-devspaces` | `devspaces` | `stable` |
@@ -89,7 +90,7 @@ Check that Argo CD has created and synced all feature applications:
 oc get applications -n openshift-gitops
 ```
 
-You should see three applications: `connectivity-link`, `developer-hub`, and `dev-spaces`.
+You should see four applications: `service-mesh`, `connectivity-link`, `developer-hub`, and `dev-spaces`.
 
 Watch them sync:
 
@@ -132,6 +133,7 @@ bootstrap/
   phase-2/            # ApplicationSet + ClusterRoleBinding for Argo CD
 clusters/
   features/
+    service-mesh/      # OpenShift Service Mesh 3 (Istio) — required by Connectivity Link
     connectivity-link/ # Red Hat Connectivity Link operator
     developer-hub/     # Red Hat Developer Hub operator
     dev-spaces/        # Red Hat OpenShift Dev Spaces operator

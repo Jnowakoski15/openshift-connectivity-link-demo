@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Declarative GitOps project for OpenShift 4.21 using Kustomize and Argo CD (OpenShift GitOps 1.21). Provisions a cluster with Connectivity Link, Developer Hub, and Dev Spaces through a two-phase bootstrap. Hosted on GitHub.
+Declarative GitOps project for OpenShift 4.19+ using Kustomize and Argo CD (OpenShift GitOps 1.21). Provisions a cluster with Service Mesh 3, Connectivity Link, Developer Hub, and Dev Spaces through a two-phase bootstrap. Hosted on GitHub.
 
 ## Architecture
 
@@ -16,15 +16,18 @@ Declarative GitOps project for OpenShift 4.21 using Kustomize and Argo CD (OpenS
 
 ### Feature Directory Convention
 
-Each feature lives at `clusters/features/<feature-name>/` with a `kustomization.yaml` entry point. Standard pattern per feature: `namespace.yaml` + `operator-group.yaml` + `subscription.yaml`. The ApplicationSet creates one Argo CD Application per directory with automated sync, prune, and self-heal enabled.
+Each feature lives at `clusters/features/<feature-name>/` with a `kustomization.yaml` entry point. Standard pattern per feature: `namespace.yaml` + `operator-group.yaml` + `subscription.yaml` + CR. Resources use Argo CD sync wave annotations (wave 0: namespaces/operatorgroups, wave 1: subscriptions, wave 2: CRs with `SkipDryRunOnMissingResource`). The ApplicationSet creates one Argo CD Application per directory with automated sync, prune, self-heal, and retry policy enabled.
 
 ### Current Features
 
 | Feature | Directory | Namespace | OLM Package | Channel |
 |---------|-----------|-----------|-------------|---------|
+| Service Mesh 3 | `clusters/features/service-mesh/` | `openshift-operators` | `servicemeshoperator3` | `stable` |
 | Connectivity Link | `clusters/features/connectivity-link/` | `kuadrant-system` | `rhcl-operator` | `stable` |
 | Developer Hub | `clusters/features/developer-hub/` | `rhdh-operator` | `rhdh` | `fast` |
 | Dev Spaces | `clusters/features/dev-spaces/` | `openshift-devspaces` | `devspaces` | `stable` |
+
+Service Mesh 3 is a prerequisite for Connectivity Link. It installs into `openshift-operators` (all-namespaces mode, no OperatorGroup needed) and deploys Istio into `istio-system` and IstioCNI into `istio-cni`.
 
 ### ApplicationSet Repo URL
 
