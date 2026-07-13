@@ -5,6 +5,9 @@ metadata:
   namespace: rhdh-operator
   labels:
     app.kubernetes.io/name: backstage
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   application:
     appConfig:
