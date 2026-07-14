@@ -26,10 +26,9 @@ Each feature lives at `clusters/features/<feature-name>/` with a `kustomization.
 | Connectivity Link | `clusters/features/connectivity-link/` | `kuadrant-system` | `rhcl-operator` | `stable` |
 | Developer Hub | `clusters/features/developer-hub/` | `rhdh-operator` | `rhdh` | `fast` |
 | Dev Spaces | `clusters/features/dev-spaces/` | `openshift-devspaces` | `devspaces` | `stable` |
-| cert-manager | `clusters/features/cert-manager/` | `cert-manager-operator` | `openshift-cert-manager-operator` | `stable-v1` |
 | API Gateway | `clusters/features/api-gateway/` | `api-gateway` | — | — |
 
-Service Mesh 3 is a prerequisite for Connectivity Link. The API Gateway feature has no operator of its own — it creates a Kubernetes Gateway API `Gateway` with Kuadrant protection policies (AuthPolicy, RateLimitPolicy, TLSPolicy) that depend on the Service Mesh 3, Connectivity Link, and cert-manager operators. It installs into `openshift-operators` (all-namespaces mode, no OperatorGroup needed) and deploys Istio into `istio-system` and IstioCNI into `istio-cni`.
+Service Mesh 3 is a prerequisite for Connectivity Link. It installs into `openshift-operators` (all-namespaces mode, no OperatorGroup needed) and deploys Istio into `istio-system` and IstioCNI into `istio-cni`. The API Gateway feature has no operator of its own — it creates a Kubernetes Gateway API `Gateway` (ClusterIP, accessed via OpenShift passthrough Routes) with Kuadrant protection policies (AuthPolicy, RateLimitPolicy). HTTPS uses the existing ROSA `*.apps` wildcard TLS cert copied into the `api-gateway` namespace.
 
 ### ApplicationSet Repo URL
 

@@ -3,6 +3,5 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - gateway.yaml
-  - tls-policy.yaml
   - auth-policy.yaml
   - rate-limit-policy.yaml
