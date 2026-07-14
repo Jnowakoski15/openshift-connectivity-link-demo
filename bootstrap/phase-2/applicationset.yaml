@@ -24,6 +24,18 @@ spec:
         path: "{{.path.path}}"
       destination:
         server: https://kubernetes.default.svc
+      ignoreDifferences:
+        - group: sailoperator.io
+          kind: Istio
+          jqPathExpressions:
+            - .spec.version
+            - .spec.updateStrategy
+            - .spec.values
+        - group: sailoperator.io
+          kind: IstioCNI
+          jqPathExpressions:
+            - .spec.version
+            - .spec.values
       syncPolicy:
         automated:
           prune: true
