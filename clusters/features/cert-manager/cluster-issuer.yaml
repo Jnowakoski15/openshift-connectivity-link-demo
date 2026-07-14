@@ -16,3 +16,9 @@ spec:
           route53:
             region: us-east-2
             hostedZoneID: Z08113743W1ZMMMMS5W11
+            accessKeyIDSecretRef:
+              name: aws-route53-credentials
+              key: access-key-id
+            secretAccessKeySecretRef:
+              name: aws-route53-credentials
+              key: secret-access-key
