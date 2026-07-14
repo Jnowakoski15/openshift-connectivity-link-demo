@@ -1,0 +1,28 @@
+apiVersion: kuadrant.io/v1
+kind: AuthPolicy
+metadata:
+  name: api-gateway-auth
+  namespace: api-gateway
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: Gateway
+    name: api-gateway
+  defaults:
+    strategy: atomic
+    rules:
+      authorization:
+        deny-all:
+          opa:
+            rego: "allow = false"
+      response:
+        unauthorized:
+          headers:
+            content-type:
+              value: application/json
+          body:
+            value: |
+              {"error": "Forbidden", "message": "Access denied by gateway default policy. Create a route-level AuthPolicy to configure authentication."}

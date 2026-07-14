@@ -1,0 +1,19 @@
+apiVersion: kuadrant.io/v1
+kind: RateLimitPolicy
+metadata:
+  name: api-gateway-rl
+  namespace: api-gateway
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: Gateway
+    name: api-gateway
+  defaults:
+    limits:
+      global:
+        rates:
+          - limit: 50
+            window: 10s

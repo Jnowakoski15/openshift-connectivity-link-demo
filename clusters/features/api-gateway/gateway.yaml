@@ -1,0 +1,32 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: api-gateway
+  namespace: api-gateway
+  labels:
+    kuadrant.io/gateway: "true"
+  annotations:
+    kuadrant.io/namespace: kuadrant-system
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  gatewayClassName: istio
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      hostname: "*.apps.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com"
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https
+      port: 443
+      protocol: HTTPS
+      hostname: "*.apps.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: api-gateway-tls
+      allowedRoutes:
+        namespaces:
+          from: All
