@@ -12,13 +12,6 @@ metadata:
 spec:
   gatewayClassName: istio
   listeners:
-    - name: http
-      port: 80
-      protocol: HTTP
-      hostname: "*.gw.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com"
-      allowedRoutes:
-        namespaces:
-          from: All
     - name: https
       port: 443
       protocol: HTTPS
