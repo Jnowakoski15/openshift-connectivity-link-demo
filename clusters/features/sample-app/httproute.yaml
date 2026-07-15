@@ -21,6 +21,9 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: httpbin
+        - group: ''
+          kind: Service
+          name: httpbin
           namespace: sample-app
           port: 8080
+          weight: 1
