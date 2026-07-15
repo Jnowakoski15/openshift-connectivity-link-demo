@@ -7,7 +7,6 @@ metadata:
     kuadrant.io/gateway: "true"
   annotations:
     kuadrant.io/namespace: kuadrant-system
-    networking.istio.io/service-type: ClusterIP
     argocd.argoproj.io/sync-wave: "2"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
@@ -16,21 +15,18 @@ spec:
     - name: http
       port: 80
       protocol: HTTP
-      hostname: "*.apps.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com"
+      hostname: "*.custom-apps.rosa-pfqsf.to0l.p3.openshiftapps.com"
       allowedRoutes:
         namespaces:
           from: All
     - name: https
       port: 443
       protocol: HTTPS
-      hostname: "*.apps.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com"
+      hostname: "*.custom-apps.rosa-pfqsf.to0l.p3.openshiftapps.com"
       tls:
         mode: Terminate
         certificateRefs:
-          - group: ''
-            kind: Secret
-            name: default-ingress-cert
-            namespace: openshift-ingress
+          - name: api-gateway-tls
       allowedRoutes:
         namespaces:
           from: All

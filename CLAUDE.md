@@ -24,11 +24,12 @@ Each feature lives at `clusters/features/<feature-name>/` with a `kustomization.
 |---------|-----------|-----------|-------------|---------|
 | Service Mesh 3 | `clusters/features/service-mesh/` | `openshift-operators` | `servicemeshoperator3` | `stable` |
 | Connectivity Link | `clusters/features/connectivity-link/` | `kuadrant-system` | `rhcl-operator` | `stable` |
+| cert-manager | `clusters/features/cert-manager/` | `cert-manager-operator` | `openshift-cert-manager-operator` | `stable-v1` |
 | Developer Hub | `clusters/features/developer-hub/` | `rhdh-operator` | `rhdh` | `fast` |
 | Dev Spaces | `clusters/features/dev-spaces/` | `openshift-devspaces` | `devspaces` | `stable` |
 | API Gateway | `clusters/features/api-gateway/` | `api-gateway` | — | — |
 
-Service Mesh 3 is a prerequisite for Connectivity Link. It installs into `openshift-operators` (all-namespaces mode, no OperatorGroup needed) and deploys Istio into `istio-system` and IstioCNI into `istio-cni`. The API Gateway feature has no operator of its own — it creates a Kubernetes Gateway API `Gateway` (ClusterIP, accessed via OpenShift passthrough Routes) with Kuadrant protection policies (AuthPolicy, RateLimitPolicy). HTTPS uses the existing ROSA `*.apps` wildcard TLS cert copied into the `api-gateway` namespace.
+Service Mesh 3 is a prerequisite for Connectivity Link. It installs into `openshift-operators` (all-namespaces mode, no OperatorGroup needed) and deploys Istio into `istio-system` and IstioCNI into `istio-cni`. The API Gateway feature has no operator of its own — it creates a Kubernetes Gateway API `Gateway` (LoadBalancer) with Kuadrant protection policies (AuthPolicy, RateLimitPolicy, TLSPolicy, DNSPolicy). TLS certificates are provisioned by cert-manager via Let's Encrypt (Route53 DNS-01). DNSPolicy manages Route53 records pointing `*.custom-apps.rosa-pfqsf.to0l.p3.openshiftapps.com` to the gateway's NLB. Two AWS credentials Secrets must be created out-of-band: `aws-route53-credentials` in `cert-manager` (for the ClusterIssuer) and `aws-dns-credentials` in `api-gateway` (for DNSPolicy, type `kuadrant.io/aws`).
 
 ### ApplicationSet Repo URL
 
