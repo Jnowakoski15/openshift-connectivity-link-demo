@@ -29,7 +29,8 @@ spec:
         certificateRefs:
           - group: ''
             kind: Secret
-            name: api-gateway-tls
+            name: default-ingress-cert
+            namespace: openshift-ingress
       allowedRoutes:
         namespaces:
           from: All
