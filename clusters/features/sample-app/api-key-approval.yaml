@@ -1,0 +1,16 @@
+apiVersion: devportal.kuadrant.io/v1alpha1
+kind: APIKeyApproval
+metadata:
+  name: demo-user-key-approval
+  namespace: sample-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "6"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  apiKeyRequestRef:
+    name: demo-user-key-request
+  approved: true
+  reviewedBy: platform-admin
+  reviewedAt: "2026-07-15T00:00:00Z"
+  reason: "Approved"
+  message: "Demo access granted for bronze tier"

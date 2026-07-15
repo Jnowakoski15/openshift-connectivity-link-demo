@@ -1,0 +1,29 @@
+apiVersion: extensions.kuadrant.io/v1alpha1
+kind: PlanPolicy
+metadata:
+  name: sample-app-plans
+  namespace: sample-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: sample-app
+  plans:
+    - tier: gold
+      predicate: 'auth.identity.metadata.annotations["secret.kuadrant.io/plan-id"] == "gold"'
+      limits:
+        daily: 10000
+        monthly: 250000
+    - tier: silver
+      predicate: 'auth.identity.metadata.annotations["secret.kuadrant.io/plan-id"] == "silver"'
+      limits:
+        daily: 1000
+        monthly: 25000
+    - tier: bronze
+      predicate: 'auth.identity.metadata.annotations["secret.kuadrant.io/plan-id"] == "bronze"'
+      limits:
+        daily: 100
+        monthly: 2000

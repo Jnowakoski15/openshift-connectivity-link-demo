@@ -6,3 +6,9 @@ resources:
   - service.yaml
   - httproute.yaml
   - auth-policy.yaml
+  - plan-policy.yaml
+  - api-key-secret.yaml
+  - api-product.yaml
+  - api-key.yaml
+  - api-key-request.yaml
+  - api-key-approval.yaml
