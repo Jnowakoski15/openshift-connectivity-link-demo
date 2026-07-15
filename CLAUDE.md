@@ -28,8 +28,22 @@ Each feature lives at `clusters/features/<feature-name>/` with a `kustomization.
 | Developer Hub | `clusters/features/developer-hub/` | `rhdh-operator` | `rhdh` | `fast` |
 | Dev Spaces | `clusters/features/dev-spaces/` | `openshift-devspaces` | `devspaces` | `stable` |
 | API Gateway | `clusters/features/api-gateway/` | `api-gateway` | — | — |
+| Sample App | `clusters/features/sample-app/` | `sample-app` | — | — |
 
-Service Mesh 3 is a prerequisite for Connectivity Link. It installs into `openshift-operators` (all-namespaces mode, no OperatorGroup needed) and deploys Istio into `istio-system` and IstioCNI into `istio-cni`. The API Gateway feature has no operator of its own — it creates a Kubernetes Gateway API `Gateway` (LoadBalancer) with Kuadrant protection policies (AuthPolicy, RateLimitPolicy, TLSPolicy, DNSPolicy). TLS certificates are provisioned by cert-manager via Let's Encrypt (Route53 DNS-01). DNSPolicy manages Route53 records pointing `*.custom-apps.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com` to the gateway's NLB. Two AWS credentials Secrets must be created out-of-band: `aws-route53-credentials` in `cert-manager` (for the ClusterIssuer) and `aws-dns-credentials` in `api-gateway` (for DNSPolicy, type `kuadrant.io/aws`).
+Service Mesh 3 is a prerequisite for Connectivity Link. It installs into `openshift-operators` (all-namespaces mode, no OperatorGroup needed) and deploys Istio into `istio-system` and IstioCNI into `istio-cni`. The API Gateway feature has no operator of its own — it creates a Kubernetes Gateway API `Gateway` (HTTPS-only LoadBalancer) with Kuadrant protection policies (AuthPolicy, RateLimitPolicy, TLSPolicy, DNSPolicy). TLS certificates are provisioned by cert-manager via Let's Encrypt (Route53 DNS-01). DNSPolicy manages Route53 records pointing `*.gw.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com` to the gateway's NLB. The cert-manager CertManager CR is configured with `--dns01-recursive-nameservers-only` and `--dns01-recursive-nameservers=8.8.8.8:53,1.1.1.1:53` to avoid split-horizon DNS issues on ROSA clusters. The gateway uses a deny-by-default AuthPolicy (OPA `allow = false`) that individual apps override at the HTTPRoute level. The sample-app feature deploys httpbin (go-httpbin) with an HTTPRoute and an allow-all AuthPolicy override.
+
+### DNS Architecture
+
+ROSA clusters have both public and private Route53 hosted zones for the same domain, causing Kuadrant's DNS operator to fail with "multiple zones found". To work around this, a **dedicated public hosted zone** (`gw.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com`, zone `Z0688131ONQ3PCUBTGDM`) is used with NS delegation records in the parent public zone. The gateway hostname `*.gw.rosa...` is one level below the zone apex, avoiding the "apex domain not allowed" restriction.
+
+### Out-of-Band Prerequisites
+
+Two AWS credentials Secrets must be created manually before Argo CD syncs:
+
+1. `aws-route53-credentials` in `cert-manager-operator` namespace (for the ClusterIssuer DNS-01 solver). Keys: `access-key-id`, `secret-access-key`.
+2. `aws-dns-credentials` in `api-gateway` namespace (for DNSPolicy). Type: `kuadrant.io/aws`. Keys: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`.
+
+The dedicated Route53 hosted zone and NS delegation in the parent zone must also be created manually.
 
 ### ApplicationSet Repo URL
 

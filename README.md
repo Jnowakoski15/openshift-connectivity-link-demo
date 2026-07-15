@@ -19,14 +19,66 @@ Once both phases are applied, Argo CD manages itself and all features from this 
 |---------|-----------|-----------------|---------|
 | [Red Hat OpenShift Service Mesh 3](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.0) | `openshift-operators` | `servicemeshoperator3` | `stable` |
 | [Red Hat Connectivity Link](https://docs.redhat.com/en/documentation/red_hat_connectivity_link/) | `kuadrant-system` | `rhcl-operator` | `stable` |
+| [cert-manager](https://docs.openshift.com/container-platform/latest/security/cert_manager_operator/index.html) | `cert-manager-operator` | `openshift-cert-manager-operator` | `stable-v1` |
 | [Red Hat Developer Hub](https://docs.redhat.com/en/documentation/red_hat_developer_hub/) | `rhdh-operator` | `rhdh` | `fast` |
 | [Red Hat OpenShift Dev Spaces](https://docs.redhat.com/en/documentation/red_hat_openshift_dev_spaces/) | `openshift-devspaces` | `devspaces` | `stable` |
+| API Gateway | `api-gateway` | — | — |
+| Sample App (httpbin) | `sample-app` | — | — |
 
 ## Prerequisites
 
-- OpenShift Container Platform **4.19+** cluster
+- OpenShift Container Platform **4.19+** cluster (ROSA supported)
 - `oc` CLI installed and authenticated as **cluster-admin**
 - A fork of this repository pushed to GitHub (Argo CD needs to pull from it)
+- An AWS account with Route53 access for DNS and TLS certificate management
+- A dedicated Route53 public hosted zone for the gateway subdomain (see [DNS Setup](#dns-setup) below)
+
+## Pre-Installation Setup
+
+Before deploying, you must complete the following steps manually. These resources contain credentials and DNS configuration that cannot be stored in Git.
+
+### DNS Setup
+
+The API Gateway uses a dedicated Route53 hosted zone to avoid conflicts with ROSA's default public/private split-horizon DNS zones.
+
+1. **Create a dedicated public hosted zone** in Route53 for your gateway subdomain (e.g. `gw.<cluster-domain>`). This zone must be separate from any existing ROSA-managed zones.
+
+2. **Add NS delegation records** in the parent public hosted zone. In the parent zone, create an NS record pointing your gateway subdomain to the nameservers of the new dedicated zone. For example, if your dedicated zone is `gw.rosa.example.openshiftapps.com`, create an NS record for `gw` in the `rosa.example.openshiftapps.com` parent zone with all 4 nameservers from the dedicated zone.
+
+3. **Update the manifests** with your zone ID and hostnames:
+   - `clusters/features/cert-manager/cluster-issuer.yaml` — set `hostedZoneID` to your dedicated zone ID
+   - `clusters/features/api-gateway/gateway.yaml` — set the listener hostname to `*.<your-gateway-subdomain>`
+   - `clusters/features/sample-app/httproute.yaml` — set the hostname to `sample-app.<your-gateway-subdomain>`
+
+### AWS Credentials Secrets
+
+Two Secrets must be created manually before Argo CD syncs the features. They use different key formats.
+
+**1. cert-manager Route53 credentials** (for DNS-01 ACME challenges):
+
+```bash
+oc create namespace cert-manager-operator
+
+oc create secret generic aws-route53-credentials \
+  --namespace=cert-manager-operator \
+  --from-literal=access-key-id=<AWS_ACCESS_KEY_ID> \
+  --from-literal=secret-access-key=<AWS_SECRET_ACCESS_KEY>
+```
+
+**2. DNSPolicy AWS credentials** (for Kuadrant DNS record management):
+
+```bash
+oc create namespace api-gateway
+
+oc create secret generic aws-dns-credentials \
+  --namespace=api-gateway \
+  --type=kuadrant.io/aws \
+  --from-literal=AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> \
+  --from-literal=AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> \
+  --from-literal=AWS_REGION=<AWS_REGION>
+```
+
+> **Note:** The same IAM user can be used for both Secrets. The IAM user needs permissions for `route53:ChangeResourceRecordSets`, `route53:GetHostedZone`, `route53:ListHostedZones`, and `route53:ListResourceRecordSets` on the dedicated hosted zone.
 
 ## Deploy
 
@@ -90,7 +142,7 @@ Check that Argo CD has created and synced all feature applications:
 oc get applications -n openshift-gitops
 ```
 
-You should see four applications: `service-mesh`, `connectivity-link`, `developer-hub`, and `dev-spaces`.
+You should see seven applications: `service-mesh`, `connectivity-link`, `cert-manager`, `api-gateway`, `sample-app`, `developer-hub`, and `dev-spaces`.
 
 Watch them sync:
 
@@ -129,12 +181,15 @@ Log in with username `admin` and the extracted password.
 
 ```
 bootstrap/
-  phase-1/            # GitOps operator install (Namespace, OperatorGroup, Subscription)
-  phase-2/            # ApplicationSet + ClusterRoleBinding for Argo CD
+  phase-1/              # GitOps operator install (Namespace, OperatorGroup, Subscription)
+  phase-2/              # ApplicationSet + ClusterRoleBinding for Argo CD
 clusters/
   features/
-    service-mesh/      # OpenShift Service Mesh 3 (Istio) — required by Connectivity Link
-    connectivity-link/ # Red Hat Connectivity Link operator
-    developer-hub/     # Red Hat Developer Hub operator
-    dev-spaces/        # Red Hat OpenShift Dev Spaces operator
+    service-mesh/       # OpenShift Service Mesh 3 (Istio) — required by Connectivity Link
+    connectivity-link/  # Red Hat Connectivity Link operator
+    cert-manager/       # cert-manager operator + ClusterIssuer (Let's Encrypt, Route53 DNS-01)
+    api-gateway/        # Kubernetes Gateway API Gateway + Kuadrant policies (Auth, RateLimit, TLS, DNS)
+    sample-app/         # httpbin demo app with HTTPRoute and AuthPolicy override
+    developer-hub/      # Red Hat Developer Hub operator
+    dev-spaces/         # Red Hat OpenShift Dev Spaces operator
 ```
