@@ -15,14 +15,14 @@ spec:
     - name: http
       port: 80
       protocol: HTTP
-      hostname: "*.custom-apps.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com"
+      hostname: "custom-apps.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com"
       allowedRoutes:
         namespaces:
           from: All
     - name: https
       port: 443
       protocol: HTTPS
-      hostname: "*.custom-apps.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com"
+      hostname: "custom-apps.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com"
       tls:
         mode: Terminate
         certificateRefs:
