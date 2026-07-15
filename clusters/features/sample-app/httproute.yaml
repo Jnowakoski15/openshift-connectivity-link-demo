@@ -14,7 +14,7 @@ spec:
       namespace: api-gateway
       sectionName: https
   hostnames:
-    - custom-apps.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com
+    - sample-app.gw.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com
   rules:
     - matches:
         - path:
