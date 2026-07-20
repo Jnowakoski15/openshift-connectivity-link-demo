@@ -1,0 +1,18 @@
+apiVersion: devportal.kuadrant.io/v1alpha1
+kind: APIKey
+metadata:
+  name: demo-user-key
+  namespace: sample-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  apiProductRef:
+    name: sample-app-api
+  planTier: bronze
+  requestedBy:
+    email: demo-user@example.com
+    userId: demo-user
+  secretRef:
+    name: demo-user-api-key
+  useCase: "Demo application testing and API management demonstration"

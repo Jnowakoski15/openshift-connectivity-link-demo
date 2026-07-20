@@ -1,0 +1,26 @@
+apiVersion: devportal.kuadrant.io/v1alpha1
+kind: APIProduct
+metadata:
+  name: sample-app-api
+  namespace: sample-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  displayName: "Sample App API"
+  description: "HTTPBin-based sample API with tiered access plans"
+  version: "v1"
+  publishStatus: Published
+  approvalMode: manual
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: sample-app
+  tags:
+    - sample
+    - httpbin
+    - demo
+  contact:
+    team: "Platform Engineering"
+  documentation:
+    docsURL: "https://httpbin.org"

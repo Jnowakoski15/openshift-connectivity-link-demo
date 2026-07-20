@@ -164,6 +164,53 @@ oc extract secret/openshift-gitops-cluster -n openshift-gitops --to=- --keys=adm
 
 Log in with username `admin` and the extracted password.
 
+## Testing the Sample App API
+
+The sample app deploys an httpbin instance behind the API Gateway with API key authentication and tiered rate limiting.
+
+### Verify authentication is enforced
+
+A request without an API key should return `401 Unauthorized`:
+
+```bash
+curl -s https://sample-app.gw.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com/get
+```
+
+### Make an authenticated request
+
+Pass the API key via the `Authorization` header with the `APIKEY` prefix:
+
+```bash
+curl -H "Authorization: APIKEY demo-api-key-sample-app-12345" \
+  https://sample-app.gw.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com/get
+```
+
+A successful response returns HTTP 200 with JSON containing request headers, origin, and URL.
+
+### API key approval workflow
+
+The sample app's APIProduct uses `approvalMode: manual`. The workflow is:
+
+1. An `APIKey` and `APIKeyRequest` are created (declared in Git or via the dev portal)
+2. An admin approves the request through the Kuadrant console plugin at **Connectivity Link → API Key Approvals**
+3. Once approved, the APIKey status transitions to `APPROVED: True`
+
+Check approval status:
+
+```bash
+oc get apikey -n sample-app
+```
+
+### Rate limit tiers
+
+The PlanPolicy defines three tiers. The demo key uses the **bronze** tier:
+
+| Tier | Daily Limit | Monthly Limit |
+|------|-------------|---------------|
+| Gold | 10,000 | 250,000 |
+| Silver | 1,000 | 25,000 |
+| Bronze | 100 | 2,000 |
+
 ## Adding a new feature
 
 1. Create a new directory under `clusters/features/<feature-name>/`

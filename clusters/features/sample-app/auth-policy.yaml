@@ -12,7 +12,25 @@ spec:
     kind: HTTPRoute
     name: sample-app
   rules:
+    authentication:
+      api-key-users:
+        apiKey:
+          selector:
+            matchLabels:
+              app: sample-app-api
+          allNamespaces: true
+        credentials:
+          authorizationHeader:
+            prefix: APIKEY
     authorization:
       allow-all:
         opa:
           rego: "allow = true"
+    response:
+      unauthenticated:
+        headers:
+          content-type:
+            value: application/json
+        body:
+          value: |
+            {"error": "Unauthorized", "message": "A valid API key is required. Pass it via: Authorization: APIKEY <your-key>"}
