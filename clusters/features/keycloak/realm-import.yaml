@@ -1,0 +1,32 @@
+apiVersion: k8s.keycloak.org/v2alpha1
+kind: KeycloakRealmImport
+metadata:
+  name: api-demo-realm
+  namespace: keycloak
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  keycloakCRName: keycloak
+  realm:
+    id: api-demo
+    realm: api-demo
+    displayName: API Demo
+    enabled: true
+    sslRequired: none
+    accessTokenLifespan: 300
+    clients:
+      - clientId: sample-app-client
+        name: Sample App API Client
+        enabled: true
+        clientAuthenticatorType: client-secret
+        secret: sample-app-client-secret-changeme
+        publicClient: false
+        serviceAccountsEnabled: true
+        standardFlowEnabled: false
+        directAccessGrantsEnabled: false
+        protocol: openid-connect
+        redirectUris:
+          - "https://sample-app-oidc.gw.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com/*"
+        webOrigins:
+          - "https://sample-app-oidc.gw.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com"

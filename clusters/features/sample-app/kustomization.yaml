@@ -11,3 +11,5 @@ resources:
   - api-product.yaml
   - api-key.yaml
   - api-key-request.yaml
+  - httproute-oidc.yaml
+  - auth-policy-oidc.yaml

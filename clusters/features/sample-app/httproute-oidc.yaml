@@ -1,0 +1,23 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: sample-app-oidc
+  namespace: sample-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  parentRefs:
+    - name: api-gateway
+      namespace: api-gateway
+      sectionName: https
+  hostnames:
+    - sample-app-oidc.gw.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: httpbin
+          port: 8080

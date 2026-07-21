@@ -1,0 +1,33 @@
+apiVersion: kuadrant.io/v1
+kind: AuthPolicy
+metadata:
+  name: sample-app-oidc-auth
+  namespace: sample-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: sample-app-oidc
+  rules:
+    authentication:
+      keycloak-jwt:
+        jwt:
+          issuerUrl: http://keycloak-service.keycloak.svc.cluster.local:8080/realms/api-demo
+        credentials:
+          authorizationHeader:
+            prefix: Bearer
+    authorization:
+      allow-all:
+        opa:
+          rego: "allow = true"
+    response:
+      unauthenticated:
+        headers:
+          content-type:
+            value: application/json
+        body:
+          value: |
+            {"error": "Unauthorized", "message": "A valid Bearer token is required. Obtain one from the Keycloak token endpoint: POST /realms/api-demo/protocol/openid-connect/token with grant_type=client_credentials, client_id=sample-app-client, and client_secret"}
