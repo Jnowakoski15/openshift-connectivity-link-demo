@@ -14,7 +14,7 @@ spec:
       namespace: api-gateway
       sectionName: https
   hostnames:
-    - sample-app.gw.apps.wz405duy.eastus.aroapp.io
+    - sample-app.gw.apps.nfv5d.azure.redhatworkshops.io
   rules:
     - matches:
         - path:

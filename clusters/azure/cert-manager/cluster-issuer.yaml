@@ -21,5 +21,5 @@ spec:
             subscriptionID: 57e32e6a-1e25-4ad5-abc5-634542010bfa
             tenantID: 64dc69e4-d083-49fc-9569-ebece1dd1408
             resourceGroupName: openenv-nfv5d
-            hostedZoneName: gw.apps.wz405duy.eastus.aroapp.io
+            hostedZoneName: gw.apps.nfv5d.azure.redhatworkshops.io
             environment: AzurePublicCloud
