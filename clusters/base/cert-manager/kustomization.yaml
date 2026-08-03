@@ -4,5 +4,3 @@ resources:
   - namespace.yaml
   - operator-group.yaml
   - subscription.yaml
-  - certmanager.yaml
-  - cluster-issuer.yaml

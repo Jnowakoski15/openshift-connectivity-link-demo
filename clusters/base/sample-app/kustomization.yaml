@@ -4,7 +4,6 @@ resources:
   - namespace.yaml
   - deployment.yaml
   - service.yaml
-  - httproute.yaml
   - auth-policy.yaml
   - plan-policy.yaml
   - api-key-secret.yaml
