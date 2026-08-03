@@ -76,7 +76,7 @@ Two Secrets must be created manually before Argo CD syncs.
 oc create namespace cert-manager-operator
 
 oc create secret generic aws-route53-credentials \
-  --namespace=cert-manager-operator \
+  --namespace=cert-manager \
   --from-literal=access-key-id=<AWS_ACCESS_KEY_ID> \
   --from-literal=secret-access-key=<AWS_SECRET_ACCESS_KEY>
 ```
@@ -106,7 +106,7 @@ Two Secrets must be created manually before Argo CD syncs.
 oc create namespace cert-manager-operator
 
 oc create secret generic azure-dns-credentials \
-  --namespace=cert-manager-operator \
+  --namespace=cert-manager \
   --from-literal=client-secret=<AZURE_CLIENT_SECRET>
 ```
 

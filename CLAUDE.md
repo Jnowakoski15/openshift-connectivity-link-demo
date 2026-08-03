@@ -55,14 +55,14 @@ Each cloud uses a dedicated DNS zone for the gateway hostname to avoid conflicts
 
 **ROSA (AWS)** — Two Secrets must be created manually:
 
-1. `aws-route53-credentials` in `cert-manager-operator` namespace (for the ClusterIssuer DNS-01 solver). Keys: `access-key-id`, `secret-access-key`.
+1. `aws-route53-credentials` in `cert-manager` namespace (for the ClusterIssuer DNS-01 solver). Keys: `access-key-id`, `secret-access-key`.
 2. `aws-dns-credentials` in `api-gateway` namespace (for DNSPolicy). Type: `kuadrant.io/aws`. Keys: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`.
 
 Plus: Dedicated Route53 hosted zone and NS delegation in the parent zone.
 
 **ARO (Azure)** — Two Secrets must be created manually:
 
-1. `azure-dns-credentials` in `cert-manager-operator` namespace (for the ClusterIssuer DNS-01 solver). Keys: `client-secret` (Azure service principal client secret).
+1. `azure-dns-credentials` in `cert-manager` namespace (for the ClusterIssuer DNS-01 solver). Keys: `client-secret` (Azure service principal client secret).
 2. `azure-dns-credentials` in `api-gateway` namespace (for DNSPolicy). Type: `kuadrant.io/azure`. Keys: `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_SUBSCRIPTION_ID`, `AZURE_TENANT_ID`.
 
 Plus: Dedicated Azure DNS public zone and NS delegation in the parent zone.
