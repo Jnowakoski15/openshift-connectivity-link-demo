@@ -32,6 +32,7 @@ Cloud-agnostic features live at `clusters/features/<feature-name>/`. Cloud-speci
 | Connectivity Link | `clusters/features/connectivity-link/` | `kuadrant-system` | `rhcl-operator` | `stable` |
 | Developer Hub | `clusters/features/developer-hub/` | `rhdh-operator` | `rhdh` | `fast` |
 | Dev Spaces | `clusters/features/dev-spaces/` | `openshift-devspaces` | `devspaces` | `stable` |
+| Console Plugins | `clusters/features/console-plugins/` | — | — | — |
 
 **Cloud-Specific Features** (base in `clusters/base/`, overlays in `clusters/aws/` or `clusters/azure/`):
 
@@ -49,21 +50,21 @@ Each cloud uses a dedicated DNS zone for the gateway hostname to avoid conflicts
 
 **ROSA (AWS)**: ROSA clusters have both public and private Route53 hosted zones for the same domain, causing Kuadrant's DNS operator to fail with "multiple zones found". A **dedicated public Route53 hosted zone** (`gw.rosa.rosa-pfqsf.to0l.p3.openshiftapps.com`, zone `Z0688131ONQ3PCUBTGDM`) is used with NS delegation records in the parent public zone. The cert-manager CertManager CR includes `--dns01-recursive-nameservers-only` and `--dns01-recursive-nameservers=8.8.8.8:53,1.1.1.1:53` to avoid split-horizon DNS issues.
 
-**ARO (Azure)**: A **dedicated Azure DNS public zone** (`gw.apps.wz405duy.eastus.aroapp.io`) in resource group `openenv-nfv5d` with NS delegation from the parent zone. ARO does not require the split-horizon DNS workaround.
+**ARO (Azure)**: A **dedicated Azure DNS public zone** (`gw.apps.nfv5d.azure.redhatworkshops.io`) in resource group `openenv-nfv5d` with NS delegation from the parent zone. ARO does not require the split-horizon DNS workaround.
 
 ### Out-of-Band Prerequisites
 
 **ROSA (AWS)** — Two Secrets must be created manually:
 
 1. `aws-route53-credentials` in `cert-manager` namespace (for the ClusterIssuer DNS-01 solver). Keys: `access-key-id`, `secret-access-key`.
-2. `aws-dns-credentials` in `api-gateway` namespace (for DNSPolicy). Type: `kuadrant.io/aws`. Keys: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`.
+2. `aws-dns-credentials` in `kuadrant-system` namespace (for DNSPolicy — the DNS operator looks for provider secrets in its own namespace). Type: `kuadrant.io/aws`. Keys: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`.
 
 Plus: Dedicated Route53 hosted zone and NS delegation in the parent zone.
 
 **ARO (Azure)** — Two Secrets must be created manually:
 
-1. `azure-dns-credentials` in `cert-manager` namespace (for the ClusterIssuer DNS-01 solver). Keys: `client-secret` (Azure service principal client secret).
-2. `azure-dns-credentials` in `api-gateway` namespace (for DNSPolicy). Type: `kuadrant.io/azure`. Keys: `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_SUBSCRIPTION_ID`, `AZURE_TENANT_ID`.
+1. `azure-dns-credentials` in `cert-manager` namespace (for the ClusterIssuer DNS-01 solver). Type: Opaque. Keys: `client-secret` (Azure service principal client secret).
+2. `azure-dns-credentials` in `kuadrant-system` namespace (for DNSPolicy — the DNS operator looks for provider secrets in its own namespace). Type: `kuadrant.io/azure`. Data: single key `azure.json` containing a JSON object with fields: `tenantId`, `subscriptionId`, `resourceGroup`, `aadClientId`, `aadClientSecret`.
 
 Plus: Dedicated Azure DNS public zone and NS delegation in the parent zone.
 
