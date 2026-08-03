@@ -5,6 +5,7 @@ resources:
   - deployment.yaml
   - service.yaml
   - auth-policy.yaml
+  - auth-policy-public.yaml
   - plan-policy.yaml
   - api-key-secret.yaml
   - api-product.yaml

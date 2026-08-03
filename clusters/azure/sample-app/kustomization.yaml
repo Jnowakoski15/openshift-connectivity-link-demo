@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - ../../base/sample-app
   - httproute.yaml
+  - httproute-public.yaml
