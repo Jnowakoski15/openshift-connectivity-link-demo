@@ -10,7 +10,7 @@ spec:
   generators:
     - git:
         repoURL: https://github.com/Jnowakoski15/openshift-connectivity-link-demo.git
-        revision: feature/aro-support
+        revision: HEAD
         directories:
           - path: clusters/azure/*
   template:
@@ -20,7 +20,7 @@ spec:
       project: default
       source:
         repoURL: https://github.com/Jnowakoski15/openshift-connectivity-link-demo.git
-        targetRevision: feature/aro-support
+        targetRevision: HEAD
         path: "{{.path.path}}"
       destination:
         server: https://kubernetes.default.svc
